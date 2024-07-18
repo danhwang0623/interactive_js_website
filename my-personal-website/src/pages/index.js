@@ -1,11 +1,11 @@
 import Head from "next/head";
-import Header from "../app/components/Header";
-import Hero from "../app/components/Hero";
-import About from "../app/components/About";
-import Projects from "../app/components/Projects";
-import Contact from "../app/components/Contact";
-import Footer from "../app/components/Footer";
-import GlobalStyle from "../styles/GlobalStyle";
+import Header from "../app/components/header";
+import Hero from "../app/components/hero";
+import About from "../app/components/about";
+import Projects from "../app/components/projects";
+import Contact from "../app/components/contact";
+import Footer from "../app/components/footer";
+import GlobalStyle from "../styles/globalstyle";
 
 const Home = () => (
   <div>
