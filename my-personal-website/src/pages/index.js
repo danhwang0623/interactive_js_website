@@ -1,28 +1,50 @@
-import Head from "next/head";
-import Header from "../app/components/header";
-import Hero from "../app/components/hero";
-import About from "../app/components/about";
-import Projects from "../app/components/project";
-import Contact from "../app/components/contacts";
-import Footer from "../app/components/footer";
-import GlobalStyle from "../styles/globalstyle";
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import ThreeScene from '../app/components/ThreeScene';
+import styled from 'styled-components';
 
-const Home = () => (
-  <div>
-    <Head>
-      <title>My Personal Website</title>
-      <link rel="icon" href="/favicon.ico" />
-    </Head>
-    <GlobalStyle />
-    <Header />
-    <Hero />
-    <main>
-      <About />
-      <Projects />
-      <Contact />
-    </main>
-    <Footer />
-  </div>
-);
+const IntroContainer = styled.div`
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+`;
 
-export default Home;
+const Button = styled.button`
+  position: fixed; /* Change to fixed positioning */
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  background-color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Ensure the button is on top of other elements */
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
+`;
+
+const Intro = () => {
+  const router = useRouter();
+
+  const handleContinue = () => {
+    router.push('/main');
+  };
+
+  return (
+    <IntroContainer>
+      <Head>
+        <title>Introduction</title>
+      </Head>
+      <ThreeScene />
+      <Button onClick={handleContinue}>Continue to My Site</Button>
+    </IntroContainer>
+  );
+};
+
+export default Intro;
