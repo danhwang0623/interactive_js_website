@@ -20,93 +20,105 @@ const ThreeScene = () => {
     // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true; // Enable shadow maps
     currentMount.appendChild(renderer.domElement);
 
     // OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
 
     // Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1); // Set higher intensity
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5); // Increased intensity
     directionalLight.position.set(5, 10, 7.5);
+    directionalLight.castShadow = true; // Enable shadows for the light
+    directionalLight.shadow.mapSize.width = 1024; // Shadow map resolution
+    directionalLight.shadow.mapSize.height = 1024;
     scene.add(directionalLight);
 
     // Ground
     const groundGeometry = new THREE.PlaneGeometry(100, 100);
-    const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22 });
+    const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 });
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
     scene.add(ground);
 
-    // Trees
+    // Character model (simple geometry for now)
+    const characterGeometry = new THREE.BoxGeometry(1, 2, 1);
+    const characterMaterial = new THREE.MeshStandardMaterial({ color: 0xffcc99 });
+    const character = new THREE.Mesh(characterGeometry, characterMaterial);
+    character.position.set(0, 1, 0);
+    character.castShadow = true;
+    scene.add(character);
+
+    // Add trees
     const createTree = (x, z) => {
-      const trunkGeometry = new THREE.CylinderGeometry(0.2, 0.2, 2);
+      const trunkGeometry = new THREE.CylinderGeometry(0.2, 0.2, 2, 32);
       const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
       const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
       trunk.position.set(x, 1, z);
+      trunk.castShadow = true;
+      trunk.receiveShadow = true;
 
-      const leavesGeometry = new THREE.SphereGeometry(1, 8, 8);
       const leavesMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-      const leaves = new THREE.Mesh(leavesGeometry, leavesMaterial);
-      leaves.position.set(x, 2.5, z);
+
+      // Create multiple spheres for leaves
+      const leavesGeometry1 = new THREE.SphereGeometry(1, 32, 32);
+      const leaves1 = new THREE.Mesh(leavesGeometry1, leavesMaterial);
+      leaves1.position.set(x, 2.5, z);
+      leaves1.castShadow = true;
+      leaves1.receiveShadow = true;
+
+      const leavesGeometry2 = new THREE.SphereGeometry(0.8, 32, 32);
+      const leaves2 = new THREE.Mesh(leavesGeometry2, leavesMaterial);
+      leaves2.position.set(x - 0.5, 3, z - 0.5);
+      leaves2.castShadow = true;
+      leaves2.receiveShadow = true;
+
+      const leavesGeometry3 = new THREE.SphereGeometry(0.8, 32, 32);
+      const leaves3 = new THREE.Mesh(leavesGeometry3, leavesMaterial);
+      leaves3.position.set(x + 0.5, 3, z + 0.5);
+      leaves3.castShadow = true;
+      leaves3.receiveShadow = true;
 
       scene.add(trunk);
-      scene.add(leaves);
+      scene.add(leaves1);
+      scene.add(leaves2);
+      scene.add(leaves3);
     };
 
+    // Clear area around the character
     for (let i = -10; i <= 10; i += 5) {
       for (let j = -10; j <= 10; j += 5) {
-        createTree(i, j);
+        if (Math.abs(i) > 2 && Math.abs(j) > 2) {
+          createTree(i, j);
+        }
       }
     }
 
-    // Earth with texture
-    const earthGeometry = new THREE.SphereGeometry(1.5, 32, 32);
-    const earthMaterial = new THREE.MeshStandardMaterial({
-      map: new THREE.TextureLoader().load('https://threejsfundamentals.org/threejs/resources/images/earth.jpg'),
-    });
-    const earth = new THREE.Mesh(earthGeometry, earthMaterial);
-    earth.position.set(0, 3, 0);
-    scene.add(earth);
+    // Add interactive items (e.g., tents, campfire)
+    const interactiveItems = [];
 
-    // Clouds
-    const cloudsGeometry = new THREE.SphereGeometry(1.55, 32, 32);
-    const cloudsMaterial = new THREE.MeshStandardMaterial({
-      map: new THREE.TextureLoader().load('https://threejsfundamentals.org/threejs/resources/images/earthcloudmaptrans.jpg'),
-      transparent: true,
-    });
-    const clouds = new THREE.Mesh(cloudsGeometry, cloudsMaterial);
-    clouds.position.set(0, 3, 0);
-    scene.add(clouds);
+    const createInteractiveItem = (x, z, name) => {
+      const geometry = new THREE.BoxGeometry(1, 1, 1);
+      const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+      const item = new THREE.Mesh(geometry, material);
+      item.position.set(x, 0.5, z);
+      item.name = name;
+      item.castShadow = true;
+      item.receiveShadow = true;
+      scene.add(item);
+      interactiveItems.push(item);
+    };
 
-    // Mountains (using GLTFLoader to load a model)
-    const loader = new GLTFLoader();
-    loader.load('https://threejsfundamentals.org/threejs/resources/models/mountains/scene.gltf', (gltf) => {
-      const model = gltf.scene;
-      model.scale.set(5, 5, 5);
-      model.position.set(-5, 0, -5);
-      scene.add(model);
-    });
-
-    // Water (using simple plane with texture)
-    const waterGeometry = new THREE.PlaneGeometry(100, 100);
-    const waterMaterial = new THREE.MeshStandardMaterial({
-      color: 0x1e90ff,
-      opacity: 0.6,
-      transparent: true,
-    });
-    const water = new THREE.Mesh(waterGeometry, waterMaterial);
-    water.rotation.x = -Math.PI / 2;
-    water.position.y = -1;
-    scene.add(water);
+    createInteractiveItem(5, 5, 'Tent');
+    createInteractiveItem(-5, -5, 'Campfire');
 
     // Animation loop
     const animate = () => {
       requestAnimationFrame(animate);
-      earth.rotation.y += 0.001;
-      clouds.rotation.y += 0.0015;
       controls.update();
       renderer.render(scene, camera);
     };
@@ -120,9 +132,31 @@ const ThreeScene = () => {
     };
     window.addEventListener('resize', handleResize);
 
+    // Handle mouse click
+    const handleClick = (event) => {
+      event.preventDefault();
+
+      const mouse = new THREE.Vector2(
+        (event.clientX / window.innerWidth) * 2 - 1,
+        -(event.clientY / window.innerHeight) * 2 + 1
+      );
+
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, camera);
+
+      const intersects = raycaster.intersectObjects(interactiveItems);
+
+      if (intersects.length > 0) {
+        const item = intersects[0].object;
+        alert(`You clicked on: ${item.name}`);
+      }
+    };
+    window.addEventListener('click', handleClick);
+
     // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('click', handleClick);
       currentMount.removeChild(renderer.domElement);
     };
   }, []);
@@ -131,3 +165,4 @@ const ThreeScene = () => {
 };
 
 export default ThreeScene;
+

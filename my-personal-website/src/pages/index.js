@@ -11,7 +11,7 @@ const IntroContainer = styled.div`
 `;
 
 const Button = styled.button`
-  position: fixed; /* Change to fixed positioning */
+  position: absolute;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
