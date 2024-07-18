@@ -2,8 +2,8 @@ import Head from "next/head";
 import Header from "../app/components/header";
 import Hero from "../app/components/hero";
 import About from "../app/components/about";
-import Projects from "../app/components/projects";
-import Contact from "../app/components/contact";
+import Projects from "../app/components/project";
+import Contact from "../app/components/contacts";
 import Footer from "../app/components/footer";
 import GlobalStyle from "../styles/globalstyle";
 
